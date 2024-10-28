@@ -26,8 +26,21 @@
 	"type": "module",
 	"exports": {
 		"./package.json": "./package.json",
-		".": "./out/index.js"
+		".": "./out/index.js",
+		"./basename": "./out/lib/basename.js",
+		"./dirname": "./out/lib/dirname.js",
+		"./extname": "./out/lib/extname.js",
+		"./format": "./out/lib/format.js",
+		"./join": "./out/lib/join.js",
+		"./parse": "./out/lib/parse.js",
+		"./path-builder": "./out/lib/path-builder.js",
+		"./resolve": "./out/lib/resolve.js",
+		"./type-utils": "./out/lib/type-utils.js"
 	},
+	"files": [
+		"out/index.js",
+		"out/lib/**/*"
+	],
 	"scripts": {
 		"compile": "NODE_OPTIONS=\"--max-old-space-size=3000\" tsc -b",
 		"test": "vitest",
