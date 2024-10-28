@@ -1,6 +1,6 @@
 {
 	"name": "path-ts",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Isomorphic type-safe path utilities.",
 	"keywords": [
 		"path",
@@ -38,8 +38,11 @@
 		"./type-utils": "./out/lib/type-utils.js"
 	},
 	"files": [
+		"out/index.d.ts",
+		"out/index.d.ts.map",
+		"out/index.js.map",
 		"out/index.js",
-		"out/lib/**/*"
+		"out/lib"
 	],
 	"scripts": {
 		"compile": "NODE_OPTIONS=\"--max-old-space-size=3000\" tsc -b",
