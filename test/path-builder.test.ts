@@ -23,6 +23,23 @@ test("Path builder can build children", () => {
 	expectTypeOf(resuiltBuilderGrandchild).toEqualTypeOf<PathBuilder<"/foo/bar/baz/qux">>()
 })
 
+test("Path builder preserves spaces without URL-encoding them", () => {
+	const result = PathBuilder.from("/foo bar")
+
+	expect(result.toString(), "Spaces are not percent-encoded").toBe("/foo bar")
+})
+
+test("Path builder preserves spaces in appended segments", () => {
+	const result = PathBuilder.from("/foo")("bar baz")
+
+	expect(result.toString()).toBe("/foo/bar baz")
+})
+
+test("Path builder does not truncate at # or ?", () => {
+	expect(PathBuilder.from("/a/b#c").toString(), "Fragment marker is a literal character").toBe("/a/b#c")
+	expect(PathBuilder.from("/a/b?c").toString(), "Query marker is a literal character").toBe("/a/b?c")
+})
+
 test("Path builder can proxy string methods", () => {
 	const args = ["/foo", "bar", "baz"] as const
 	const result = PathBuilder.from(...args)

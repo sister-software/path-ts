@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-wrapper-object-types */
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 
-import { resolve as _resolve, basename, dirname } from "node:path"
+import { posix } from "node:path"
 import type { PluckBasename } from "./basename.js"
 import type { PluckDirname } from "./dirname.js"
 import type { Join } from "./type-utils.js"
@@ -15,10 +15,9 @@ import type { Join } from "./type-utils.js"
 /**
  * Type-safe path builder.
  *
- * @external URL - The URL class.
  * @template S - The type of the path string.
  */
-export interface PathBuilder<S extends string> extends URL, Omit<String, keyof URL> {
+export interface PathBuilder<S extends string> extends String {
 	/**
 	 * Append additional path segments to the current path.
 	 */
@@ -34,9 +33,13 @@ export interface PathBuilder<S extends string> extends URL, Omit<String, keyof U
 export const kPathBuilder = Symbol.for("PathBuilder")
 
 /**
- * Type-safe path builder.
+ * Type-safe path builder, backed by a plain string.
+ *
+ * Unlike a `URL`, a `PathBuilder` never percent-encodes its contents and never truncates at `#` or
+ * `?`, so it round-trips arbitrary POSIX paths verbatim. Extending `String` gives instances the
+ * full string method surface for free.
  */
-export class PathBuilder<S extends string = string> extends URL implements PathBuilder<S> {
+export class PathBuilder<S extends string = string> extends String implements PathBuilder<S> {
 	/**
 	 * Runtime class identifier for the PathBuilder class.
 	 *
@@ -44,56 +47,57 @@ export class PathBuilder<S extends string = string> extends URL implements PathB
 	 */
 	public [kPathBuilder] = true
 
-	public [Symbol.hasInstance](instance: any): boolean {
-		return instance[kPathBuilder] === true
+	/**
+	 * Recognize PathBuilder instances — and their callable proxies — via the {@linkcode kPathBuilder}
+	 * brand, so `instanceof` works through the proxy returned by {@linkcode PathBuilder.from}.
+	 */
+	public static [Symbol.hasInstance](instance: unknown): boolean {
+		return instance != null && (instance as any)[kPathBuilder] === true
 	}
 
-	/**
-	 * Directory name of a path. Similar to the Unix dirname command.
-	 */
-	public dirname(): PathBuilder<PluckDirname<S>> {
-		return PathBuilder.from(dirname(this.toString())) as any
-	}
-
-	/**
-	 * Base name of a path. Similar to the Unix basename command.
-	 */
-	public basename(): PathBuilder<PluckBasename<S>> {
-		return PathBuilder.from(basename(this.toString())) as any
+	protected constructor(path: S) {
+		super(path)
 	}
 
 	/**
 	 * Get the current path as a string.
 	 */
 	public override toString(): S {
-		return this.pathname as S
+		return super.toString() as S
 	}
 
-	protected constructor(path: S, base: string | URL = "file://") {
-		super(path, base)
+	/**
+	 * Get the current path as a primitive string.
+	 */
+	public override valueOf(): S {
+		return super.valueOf() as S
+	}
+
+	/**
+	 * Directory name of a path. Similar to the Unix dirname command.
+	 */
+	public dirname(): PathBuilder<PluckDirname<S>> {
+		return PathBuilder.from(posix.dirname(this.toString())) as any
+	}
+
+	/**
+	 * Base name of a path. Similar to the Unix basename command.
+	 */
+	public basename(): PathBuilder<PluckBasename<S>> {
+		return PathBuilder.from(posix.basename(this.toString())) as any
 	}
 
 	public get [Symbol.toStringTag](): S {
 		return this.toString()
 	}
 
-	public get length() {
-		return this.toString().length
-	}
-
 	public [Symbol.toPrimitive](): S {
 		return this.toString()
 	}
 
-	public [Symbol.for("nodejs.util.inspect.custom")]() {
+	public [Symbol.for("nodejs.util.inspect.custom")](): S {
 		return this.toString()
 	}
-
-	// @note This fixes invalid Markdown in the base class JSDoc.
-	/**
-	 * The port of the URL.
-	 */
-	declare public port: string
 
 	/**
 	 * Normalize a path builder into a type-safe path builder.
@@ -131,18 +135,18 @@ export class PathBuilder<S extends string = string> extends URL implements PathB
 			return pathBuilderLike as any
 		}
 
-		const joinedPath = _resolve(
+		const resolvedPath = posix.resolve(
 			// ---
 			pathBuilderLike.toString(),
 			...pathSegmentN.map((pathSegment) => pathSegment.toString())
 		)
 
-		const pathBuilderInstance = new PathBuilder(joinedPath)
-		const toString = pathBuilderInstance.toString.bind(pathBuilderInstance)
+		const instance = new PathBuilder(resolvedPath)
+		const toString = () => instance.toString()
 
-		const PathBuilderProxy = new Proxy(PathBuilder.from, {
+		const pathBuilderProxy = new Proxy(PathBuilder.from, {
 			apply(target, _thisArg, args) {
-				return target(joinedPath, ...args)
+				return target(resolvedPath, ...args)
 			},
 
 			get(target, prop) {
@@ -158,8 +162,8 @@ export class PathBuilder<S extends string = string> extends URL implements PathB
 
 				if (prop === Symbol.toStringTag) return toString()
 
-				if (prop in pathBuilderInstance) {
-					return (pathBuilderInstance as any)[prop]
+				if (prop in instance) {
+					return (instance as any)[prop]
 				}
 
 				return (target as any)[prop]
@@ -168,32 +172,9 @@ export class PathBuilder<S extends string = string> extends URL implements PathB
 			getPrototypeOf() {
 				return PathBuilder.prototype
 			},
-
-			[Symbol.for("nodejs.util.inspect.custom")]() {
-				return "PathBuilder"
-			},
 		})
 
-		Object.assign(PathBuilderProxy, {
-			[Symbol.for("nodejs.util.inspect.custom")]: () => pathBuilderInstance.pathname,
-		})
-
-		return PathBuilderProxy as any
-	}
-}
-
-for (const [propertyName, propertyDescriptor] of Object.entries(Object.getOwnPropertyDescriptors(String.prototype))) {
-	if (propertyName === "constructor") continue
-	if (propertyName === "toString") continue
-	if (propertyName === "valueOf") continue
-	if (propertyName === "length") continue
-
-	if (Object.hasOwn(URL.prototype, propertyName)) continue
-
-	try {
-		Object.defineProperty(PathBuilder.prototype, propertyName, propertyDescriptor)
-	} catch (e) {
-		console.error(`Failed to assign property ${propertyName} to PathBuilder prototype:`, e)
+		return pathBuilderProxy as any
 	}
 }
 
