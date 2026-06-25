@@ -42,6 +42,10 @@ When configuring TypeScript, you'll have better results if you enable `strict` m
 }
 ```
 
+## POSIX semantics everywhere
+
+`path-ts` uses POSIX path semantics (the `/` separator) on every platform, including Windows and the browser. This is what lets the literal types — which are always `/`-based — match the runtime everywhere. If you need Windows (`\`) semantics, use Node's built-in `path.win32` directly.
+
 ## Browser Usage
 
 `path-ts` depends on Node's built-in `path` module, however it can be polyfilled in a browser in ESBuild or Webpack allowing you to use the same type-safe path utilities in both the browser and Node.
@@ -56,8 +60,8 @@ import { PathBuilder } from "path-ts"
 const builder = PathBuilder.from("/foo")
 
 // Builders act like immutable strings that can be appended by calling them like functions...
-const childBuilder = resultBuilder("bar")
-console.log(childBuilder) // '/foo/bar'
+const childBuilder = builder("bar")
+console.log(childBuilder.toString()) // '/foo/bar'
 ```
 
 ## Repo relative paths
@@ -124,6 +128,15 @@ export function packageOutPathBuilder<P extends MonoRepoPackageName, S extends s
 	return packagePathBuilder(packageName, OutDirectoryName, ...pathSegments)
 }
 ```
+
+# Limitations
+
+`path-ts` is honest about where the type-level model and the runtime can drift:
+
+- **POSIX only.** Types and runtime both assume `/`. Windows (`\`) paths are treated as ordinary characters, not separators. Use `node:path.win32` if you need Windows semantics.
+- **`PathBuilder.from` does not model the current working directory.** At runtime it resolves relative inputs against `process.cwd()`, but the type cannot know the cwd, so the type of `PathBuilder.from("relative")` stays relative. To get a sound absolute type, start from an absolute path or use `createPathBuilderResolver` with a bound root.
+- **Very long paths.** The recursive normalization types are bounded by the TypeScript instantiation-depth limit. Realistic paths are fine; pathological inputs fall back to `string`.
+- **`parse().name` for dotfiles.** `extname` correctly returns `""` for dotfiles like `.gitignore`, but the `name` field of `parse()` does not yet special-case the leading dot.
 
 # License
 

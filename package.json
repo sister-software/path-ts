@@ -70,7 +70,7 @@
 		"out/lib/**/*"
 	],
 	"engines": {
-		"node": ">= 10.0.0"
+		"node": ">=18"
 	},
 	"packageManager": "yarn@4.5.1",
 	"prettier": "@sister.software/prettier-config",
