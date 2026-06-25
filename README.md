@@ -127,9 +127,4 @@ export function packageOutPathBuilder<P extends MonoRepoPackageName, S extends s
 
 # License
 
-`path-ts` is licensed under the AGPL-3.0 license. Generally,
-this means that you can use the software for free, but you must share
-any modifications you make to the software.
-
-For more information on commercial usage licensing, please contact us at
-`hello@sister.software`
+`path-ts` is licensed under the MIT license. See [LICENSE.md](./LICENSE.md) for the full text.
