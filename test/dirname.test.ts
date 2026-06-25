@@ -38,3 +38,27 @@ test("Absolute directory path with trailing slash", () => {
 
 	expectTypeOf(result).toEqualTypeOf<"/path/to">()
 })
+
+test("Top-level absolute path resolves to root", () => {
+	const result = dirname("/foo")
+
+	expect(result, "Parent of a top-level entry is the root").toBe("/")
+
+	expectTypeOf(result).toEqualTypeOf<"/">()
+})
+
+test("Root is its own parent", () => {
+	const result = dirname("/")
+
+	expect(result).toBe("/")
+
+	expectTypeOf(result).toEqualTypeOf<"/">()
+})
+
+test("Single relative segment resolves to current directory", () => {
+	const result = dirname("foo")
+
+	expect(result, "Parent of a bare name is the current directory").toBe(".")
+
+	expectTypeOf(result).toEqualTypeOf<".">()
+})
