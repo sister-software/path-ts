@@ -64,3 +64,66 @@ export type Split<
 export type WithoutTrailingDelimiter<T extends string, D extends PathDelimiter = "/"> = T extends `${infer U}${D}`
 	? U
 	: T
+
+/**
+ * Whether a POSIX path string is absolute, i.e. begins with `/`.
+ */
+export type IsAbsolute<S extends string> = S extends `/${string}` ? true : false
+
+/**
+ * Fold path segments POSIX-style: drop empty and current-directory (`.`) segments, and resolve
+ * parent (`..`) segments against the accumulated output. Leading `..` segments are preserved on
+ * relative paths but cannot escape an absolute root.
+ */
+type NormalizeSegments<
+	Segments extends readonly string[],
+	Absolute extends boolean,
+	Acc extends readonly string[] = [],
+> = Segments extends readonly [infer Head extends string, ...infer Tail extends readonly string[]]
+	? Head extends "" | "."
+		? NormalizeSegments<Tail, Absolute, Acc>
+		: Head extends ".."
+			? Acc extends readonly [...infer Init extends readonly string[], infer Last extends string]
+				? Last extends ".."
+					? NormalizeSegments<Tail, Absolute, [...Acc, ".."]>
+					: NormalizeSegments<Tail, Absolute, Init>
+				: Absolute extends true
+					? NormalizeSegments<Tail, Absolute, Acc>
+					: NormalizeSegments<Tail, Absolute, [".."]>
+			: NormalizeSegments<Tail, Absolute, [...Acc, Head]>
+	: Acc
+
+/**
+ * Resolve a POSIX path's segments without regard to a trailing slash. An absolute path that
+ * resolves away all of its segments becomes `/`; a relative path that resolves to nothing becomes
+ * `.`.
+ */
+type NormalizeCore<S extends string> =
+	NormalizeSegments<Split<S, "/">, IsAbsolute<S>> extends infer Segments extends readonly string[]
+		? IsAbsolute<S> extends true
+			? `/${Join<Segments, "/">}`
+			: Segments extends readonly []
+				? "."
+				: Join<Segments, "/">
+		: never
+
+/**
+ * Whether a path string carries a trailing slash. The root `/` is not considered to have one.
+ */
+type HasTrailingSlash<S extends string> = S extends "/" ? false : S extends `${string}/` ? true : false
+
+/**
+ * Normalize a POSIX path string the way `node:path` does: collapse repeated slashes, drop `.`
+ * segments, and resolve `..` segments. A trailing slash is preserved (`foo/bar/` → `foo/bar/`,
+ * `a/../` → `./`) exactly as `node:path.normalize` does, except on the root. An absolute path that
+ * resolves away all of its segments becomes `/`; a relative path that resolves to nothing becomes
+ * `.`.
+ */
+export type Normalize<S extends string> =
+	NormalizeCore<S> extends infer Core extends string
+		? HasTrailingSlash<S> extends true
+			? Core extends "/"
+				? "/"
+				: `${Core}/`
+			: Core
+		: never
