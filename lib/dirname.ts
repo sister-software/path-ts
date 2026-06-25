@@ -1,6 +1,6 @@
 /**
  * @copyright Sister Software
- * @license AGPL-3.0
+ * @license MIT
  * @author Teffen Ellis, et al.
  */
 
@@ -29,8 +29,8 @@ export type PluckDirname<T extends string, D extends PathDelimiter = "/"> =
 /**
  * Return the directory name of a path. Similar to the Unix dirname command.
  *
- * @returns The directory name of the path.
  * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
+ * @returns The directory name of the path.
  */
 export function dirname<T extends PathBuilder | string>(
 	path: T

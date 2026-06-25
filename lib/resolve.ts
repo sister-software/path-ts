@@ -1,11 +1,11 @@
 /**
  * @copyright Sister Software
- * @license AGPL-3.0
+ * @license MIT
  * @author Teffen Ellis, et al.
  */
 
 import { resolve as _resolve } from "node:path"
-import { PathBuilder, PathBuilderLike } from "./path-builder.js"
+import { PathBuilder, type PathBuilderLike } from "./path-builder.js"
 import type { Join } from "./type-utils.js"
 
 /**
@@ -46,9 +46,8 @@ export type ResolvePathBuilderLike<
  *
  * @param pathSegment1 A sequence of paths or path segments.
  * @param pathSegmentN A sequence of paths or path segments.
- *
- * @returns An absolute path.
  * @throws {TypeError} If any of the arguments is not a string.
+ * @returns An absolute path.
  */
 export function resolvePathBuilder<T extends PathBuilderLike, Pn extends string[]>(
 	pathSegment1?: T,

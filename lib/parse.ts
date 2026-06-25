@@ -1,13 +1,13 @@
 /**
  * @copyright Sister Software
- * @license AGPL-3.0
+ * @license MIT
  * @author Teffen Ellis, et al.
  */
 
 import { parse as _parse } from "node:path"
 import { type PluckBasename } from "./basename.js"
 import { type PluckDirname } from "./dirname.js"
-import { PluckBaseFileName, PluckFileExtension } from "./extname.js"
+import type { PluckBaseFileName, PluckFileExtension } from "./extname.js"
 import type { format } from "./format.js"
 import { PathBuilder } from "./path-builder.js"
 
@@ -15,9 +15,8 @@ import { PathBuilder } from "./path-builder.js"
  * Returns an object from a path string - the opposite of format().
  *
  * @param path Path to evaluate.
- *
- * @returns A parsed path object.
  * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
+ * @returns A parsed path object.
  * @see {@linkcode ParsedPath} for the object returned.
  */
 export function parse<T extends PathBuilder | string>(

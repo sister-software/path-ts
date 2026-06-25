@@ -1,6 +1,6 @@
 /**
  * @copyright Sister Software
- * @license AGPL-3.0
+ * @license MIT
  * @author Teffen Ellis, et al.
  */
 
@@ -23,9 +23,8 @@ export type PluckBasename<T extends string, D extends PathDelimiter = "/"> =
  * the file name from a fully qualified path.
  *
  * @param path The path to evaluate.
- *
- * @returns The base name of the path.
  * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
+ * @returns The base name of the path.
  */
 export function basename<T extends PathBuilder | string>(
 	path: T

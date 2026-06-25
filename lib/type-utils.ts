@@ -1,6 +1,6 @@
 /**
  * @copyright Sister Software
- * @license AGPL-3.0
+ * @license MIT
  * @author Teffen Ellis, et al.
  *
  *   Portions of this file are derived from the `type-fest` package, which is licensed under the MIT

@@ -1,13 +1,13 @@
 /**
  * @copyright Sister Software
- * @license AGPL-3.0
+ * @license MIT
  * @author Teffen Ellis, et al.
  */
 
 import { extname as _extname } from "node:path"
-import { PluckBasename } from "./basename.js"
+import type { PluckBasename } from "./basename.js"
 import { PathBuilder } from "./path-builder.js"
-import { PathDelimiter } from "./type-utils.js"
+import type { PathDelimiter } from "./type-utils.js"
 
 /**
  * Recursively plucks the file extension from a path.
@@ -47,9 +47,8 @@ export type PluckBaseFileName<T extends string, D extends PathDelimiter = "/"> =
  * then it returns an empty string.
  *
  * @param path The Path to evaluate.
- *
- * @returns The extension of the path.
  * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
+ * @returns The extension of the path.
  */
 export function extname<T extends PathBuilder | string>(
 	path: T

@@ -1,6 +1,6 @@
 /**
  * @copyright Sister Software
- * @license AGPL-3.0
+ * @license MIT
  * @author Teffen Ellis, et al.
  */
 
@@ -93,7 +93,7 @@ export class PathBuilder<S extends string = string> extends URL implements PathB
 	/**
 	 * The port of the URL.
 	 */
-	public declare port: string
+	declare public port: string
 
 	/**
 	 * Normalize a path builder into a type-safe path builder.
