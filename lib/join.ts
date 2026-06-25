@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { join as _join } from "node:path"
+import { posix } from "node:path"
 import type { PathBuilder } from "./path-builder.js"
 import type { Join, Normalize } from "./type-utils.js"
 
@@ -45,7 +45,7 @@ export function join<P extends PathBuilder | string, Pn extends string[]>(
 	pathBuilderLike: P,
 	...pathSegmentN: Pn
 ): Normalize<Join<[P extends PathBuilder<infer T> ? T : P, ...Pn], "/">> {
-	const joinedPath = _join(
+	const joinedPath = posix.join(
 		// ---
 		pathBuilderLike.toString(),
 		...pathSegmentN.map((pathSegment) => pathSegment.toString())

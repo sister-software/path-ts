@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { format as _format } from "node:path"
+import { posix } from "node:path"
 import type { ParsedPath } from "./parse.js"
 import type { Join, PathDelimiter } from "./type-utils.js"
 
@@ -21,7 +21,7 @@ export type FormatParsedPath<T extends ParsedPath<string>, D extends PathDelimit
  * @returns The formatted path.
  */
 export function format<T extends string>(parsedPath: ParsedPath<T>): FormatParsedPath<ParsedPath<T>> {
-	return _format(parsedPath) as any
+	return posix.format(parsedPath) as any
 }
 
 export default format

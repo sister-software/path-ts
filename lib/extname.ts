@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { extname as _extname } from "node:path"
+import { posix } from "node:path"
 import type { PluckBasename } from "./basename.js"
 import { PathBuilder } from "./path-builder.js"
 import type { PathDelimiter } from "./type-utils.js"
@@ -67,7 +67,7 @@ export type PluckBaseFileName<T extends string, D extends PathDelimiter = "/"> =
 export function extname<T extends PathBuilder | string>(
 	path: T
 ): T extends PathBuilder<infer U> ? PluckFileExtension<U> : T extends string ? PluckFileExtension<T> : never {
-	return _extname(path.toString()) as any
+	return posix.extname(path.toString()) as any
 }
 
 export default extname

@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { resolve as _resolve } from "node:path"
+import { posix } from "node:path"
 import { PathBuilder, type PathBuilderLike } from "./path-builder.js"
 import type { Join } from "./type-utils.js"
 
@@ -53,7 +53,7 @@ export function resolvePathBuilder<T extends PathBuilderLike, Pn extends string[
 	pathSegment1?: T,
 	...pathSegmentN: Pn
 ): PathBuilder<ResolvePathBuilderLike<T, "/{$CWD}", Pn>> {
-	const resolved_string = _resolve(pathSegment1?.toString() || "", ...pathSegmentN)
+	const resolved_string = posix.resolve(pathSegment1?.toString() || "", ...pathSegmentN)
 
 	return PathBuilder.from(resolved_string) as any
 }

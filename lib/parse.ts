@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { parse as _parse } from "node:path"
+import { posix } from "node:path"
 import { type PluckBasename } from "./basename.js"
 import { type PluckDirname } from "./dirname.js"
 import type { PluckBaseFileName, PluckFileExtension } from "./extname.js"
@@ -22,7 +22,7 @@ import { PathBuilder } from "./path-builder.js"
 export function parse<T extends PathBuilder | string>(
 	path: T
 ): T extends PathBuilder<infer U> ? ParsedPath<U> : T extends string ? ParsedPath<T> : never {
-	return _parse(path.toString()) as any
+	return posix.parse(path.toString()) as any
 }
 
 /**

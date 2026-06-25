@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { dirname as _dirname } from "node:path"
+import { posix } from "node:path"
 import { PathBuilder } from "./path-builder.js"
 import type { Join, PathDelimiter, Split, WithoutTrailingDelimiter } from "./type-utils.js"
 
@@ -40,7 +40,7 @@ export type PluckDirname<T extends string, D extends PathDelimiter = "/"> =
 export function dirname<T extends PathBuilder | string>(
 	path: T
 ): T extends PathBuilder<infer U> ? PathBuilder<PluckDirname<U>> : T extends string ? PluckDirname<T> : never {
-	return _dirname(path.toString()) as any
+	return posix.dirname(path.toString()) as any
 }
 
 export default dirname

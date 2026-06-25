@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { basename as _basename } from "node:path"
+import { posix } from "node:path"
 import { PathBuilder } from "./path-builder.js"
 import type { PathDelimiter, Split, WithoutTrailingDelimiter } from "./type-utils.js"
 
@@ -29,7 +29,7 @@ export type PluckBasename<T extends string, D extends PathDelimiter = "/"> =
 export function basename<T extends PathBuilder | string>(
 	path: T
 ): T extends PathBuilder<infer U> ? PathBuilder<PluckBasename<U>> : T extends string ? PluckBasename<T> : never {
-	return _basename(path.toString()) as any
+	return posix.basename(path.toString()) as any
 }
 
 export default basename
