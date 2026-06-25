@@ -1,6 +1,6 @@
 {
 	"name": "path-ts",
-	"version": "1.0.5",
+	"version": "2.0.0",
 	"description": "Isomorphic type-safe path utilities.",
 	"license": "MIT",
 	"contributors": [
