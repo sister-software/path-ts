@@ -94,11 +94,13 @@ type NormalizeSegments<
 	: Acc
 
 /**
- * Resolve a POSIX path's segments without regard to a trailing slash. An absolute path that
- * resolves away all of its segments becomes `/`; a relative path that resolves to nothing becomes
- * `.`.
+ * Canonicalize a POSIX path: collapse repeated slashes, drop `.` segments, and resolve `..`
+ * segments, always dropping any trailing slash. This is the type-level analog of how
+ * `node:path.resolve` canonicalizes a path. An absolute path that resolves away all of its segments
+ * becomes `/`; a relative path that resolves to nothing becomes `.`. See {@linkcode Normalize} for
+ * the trailing-slash-preserving variant that mirrors `node:path.normalize`.
  */
-type NormalizeCore<S extends string> =
+export type Resolve<S extends string> =
 	NormalizeSegments<Split<S, "/">, IsAbsolute<S>> extends infer Segments extends readonly string[]
 		? IsAbsolute<S> extends true
 			? `/${Join<Segments, "/">}`
@@ -120,7 +122,7 @@ type HasTrailingSlash<S extends string> = S extends "/" ? false : S extends `${s
  * `.`.
  */
 export type Normalize<S extends string> =
-	NormalizeCore<S> extends infer Core extends string
+	Resolve<S> extends infer Core extends string
 		? HasTrailingSlash<S> extends true
 			? Core extends "/"
 				? "/"

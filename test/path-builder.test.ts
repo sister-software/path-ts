@@ -23,6 +23,14 @@ test("Path builder can build children", () => {
 	expectTypeOf(resuiltBuilderGrandchild).toEqualTypeOf<PathBuilder<"/foo/bar/baz/qux">>()
 })
 
+test("Path builder normalizes parent segments in both value and type", () => {
+	const parent = PathBuilder.from("/foo/bar")("..")
+
+	expect(parent.toString()).toBe("/foo")
+
+	expectTypeOf(parent).toEqualTypeOf<PathBuilder<"/foo">>()
+})
+
 test("Path builder preserves spaces without URL-encoding them", () => {
 	const result = PathBuilder.from("/foo bar")
 

@@ -10,7 +10,7 @@
 import { posix } from "node:path"
 import type { PluckBasename } from "./basename.js"
 import type { PluckDirname } from "./dirname.js"
-import type { Join } from "./type-utils.js"
+import type { Join, Resolve } from "./type-utils.js"
 
 /**
  * Type-safe path builder.
@@ -22,7 +22,7 @@ export interface PathBuilder<S extends string> extends String {
 	 * Append additional path segments to the current path.
 	 */
 	// Note: We shadow PathBuilder to allow instances of PathBuilder to be used as a function.
-	<T extends Array<string | number>>(...additionalPathSegments: T): PathBuilder<Join<[S, ...T], "/">>
+	<T extends Array<string | number>>(...additionalPathSegments: T): PathBuilder<Resolve<Join<[S, ...T], "/">>>
 }
 
 /**
@@ -107,7 +107,7 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 	public static from<P1 extends string, Pn extends string[]>(
 		pathBuilder: PathBuilder<P1>,
 		...pathSegmentN: Pn
-	): PathBuilder<Join<[P1, ...Pn], "/">>
+	): PathBuilder<Resolve<Join<[P1, ...Pn], "/">>>
 
 	/**
 	 * Create a new path builder from a string.
@@ -115,7 +115,7 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 	public static from<P1 extends string, Pn extends string[]>(
 		pathSegment1: P1,
 		...pathSegmentN: Pn
-	): PathBuilder<Join<[P1, ...Pn], "/">>
+	): PathBuilder<Resolve<Join<[P1, ...Pn], "/">>>
 
 	/**
 	 * Normalize a path builder or string into a type-safe path builder.
@@ -125,12 +125,12 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 	public static from<P extends PathBuilder | string, Pn extends string[]>(
 		pathBuilderLike: P,
 		...pathSegmentN: Pn
-	): PathBuilder<Join<[P extends PathBuilder<infer T> ? T : P, ...Pn], "/">>
+	): PathBuilder<Resolve<Join<[P extends PathBuilder<infer T> ? T : P, ...Pn], "/">>>
 
 	public static from<P extends PathBuilder | string, Pn extends string[]>(
 		pathBuilderLike: P,
 		...pathSegmentN: Pn
-	): PathBuilder<Join<[P extends PathBuilder<infer T> ? T : P, ...Pn], "/">> {
+	): PathBuilder<Resolve<Join<[P extends PathBuilder<infer T> ? T : P, ...Pn], "/">>> {
 		if (pathSegmentN.length === 0 && pathBuilderLike instanceof PathBuilder) {
 			return pathBuilderLike as any
 		}

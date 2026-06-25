@@ -6,16 +6,14 @@
 
 import { posix } from "node:path"
 import { PathBuilder, type PathBuilderLike } from "./path-builder.js"
-import type { Join } from "./type-utils.js"
+import type { Join, Resolve } from "./type-utils.js"
 
 /**
  * Type-utility for resolving a relative path-like string to an absolute path.
  */
-export type ResolvePathString<
-	S extends string,
-	Root extends string = "/",
-	Ss extends string[] = [],
-> = S extends `/${string}` ? Join<[S, ...Ss], "/"> : `${Root}/${Join<[S, ...Ss], "/">}`
+export type ResolvePathString<S extends string, Root extends string = "/", Ss extends string[] = []> = Resolve<
+	S extends `/${string}` ? Join<[S, ...Ss], "/"> : `${Root}/${Join<[S, ...Ss], "/">}`
+>
 
 /**
  * Type-utility for resolving a relative path-like string to an absolute path.
