@@ -52,3 +52,27 @@ test("File with path and multiple extensions", () => {
 
 	expectTypeOf(result).toEqualTypeOf<".gz">()
 })
+
+test("Dotfile has no extension", () => {
+	const result = extname(".gitignore")
+
+	expect(result, "A leading-dot dotfile has no extension").toBe("")
+
+	expectTypeOf(result).toEqualTypeOf<"">()
+})
+
+test("Dotfile within a directory has no extension", () => {
+	const result = extname("path/to/.env")
+
+	expect(result).toBe("")
+
+	expectTypeOf(result).toEqualTypeOf<"">()
+})
+
+test("Trailing dot yields a single-dot extension", () => {
+	const result = extname("file.")
+
+	expect(result).toBe(".")
+
+	expectTypeOf(result).toEqualTypeOf<".">()
+})

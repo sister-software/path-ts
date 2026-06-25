@@ -10,19 +10,33 @@ import { PathBuilder } from "./path-builder.js"
 import type { PathDelimiter } from "./type-utils.js"
 
 /**
- * Recursively plucks the file extension from a path.
- *
- * Note that this type deliberately does not handle paths with multiple extensions, matching the
- * behavior of the Node.js path module.
+ * Plucks the substring after the final dot of a single segment that is known to contain a dot.
  */
-export type PluckFileExtension<T extends string> = T extends `${string}.${infer FileExtensions}`
-	? FileExtensions extends `${string}.${infer SubFileExtensions}`
-		? PluckFileExtension<`.${SubFileExtensions}`>
-		: `.${FileExtensions}`
-	: ""
+type AfterLastDot<Segment extends string> = Segment extends `${infer _Head}.${infer Tail}`
+	? Tail extends `${string}.${string}`
+		? AfterLastDot<Tail>
+		: Tail
+	: Segment
 
-export type FileExtensionTest1 = PluckFileExtension<"file.txt"> // ".txt"
-export type FileExtensionTest2 = PluckFileExtension<"file.bar.min.js"> // ".js"
+/**
+ * Computes the extension of a single basename, matching Node's `path.extname` rules: the extension
+ * runs from the final dot to the end, but a path whose basename has no dot — or whose only dot is
+ * the leading character of a dotfile such as `.gitignore` — has no extension.
+ */
+type ExtnameOfBasename<Basename extends string> = Basename extends `.${infer Rest}`
+	? Rest extends `${string}.${string}`
+		? `.${AfterLastDot<Rest>}`
+		: ""
+	: Basename extends `${string}.${string}`
+		? `.${AfterLastDot<Basename>}`
+		: ""
+
+/**
+ * Plucks the file extension from a path, matching the behavior of the Node.js `path` module: it
+ * operates on the last path segment, does not handle multiple extensions (`file.tar.gz` → `.gz`),
+ * and treats leading-dot dotfiles as having no extension (`.gitignore` → ``).
+ */
+export type PluckFileExtension<T extends string> = ExtnameOfBasename<PluckBasename<T>>
 
 /**
  * Plucks the file name from a path without the extension.
