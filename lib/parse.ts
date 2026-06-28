@@ -5,6 +5,7 @@
  */
 
 import { posix } from "node:path"
+
 import { type PluckBasename } from "./basename.js"
 import { type PluckDirname } from "./dirname.js"
 import type { PluckBaseFileName, PluckFileExtension } from "./extname.js"
@@ -15,8 +16,9 @@ import { PathBuilder } from "./path-builder.js"
  * Returns an object from a path string - the opposite of format().
  *
  * @param path Path to evaluate.
- * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
+ *
  * @returns A parsed path object.
+ * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
  * @see {@linkcode ParsedPath} for the object returned.
  */
 export function parse<T extends PathBuilder | string>(

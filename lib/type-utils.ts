@@ -18,9 +18,9 @@ type JoinableItem = string | number | bigint | boolean | undefined | null
 /**
  * Coalesce a value to a string, or a fallback if the value is `null` or `undefined`.
  *
- * `null` and `undefined` are treated uniquely in the built-in join method, in a way that differs
- * from the default `toString` that would result in the type `${undefined}`. That's why we need to
- * handle it specifically with this helper.
+ * `null` and `undefined` are treated uniquely in the built-in join method, in a way that differs from the default
+ * `toString` that would result in the type `${undefined}`. That's why we need to handle it specifically with this
+ * helper.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join#description
  */
@@ -71,9 +71,9 @@ export type WithoutTrailingDelimiter<T extends string, D extends PathDelimiter =
 export type IsAbsolute<S extends string> = S extends `/${string}` ? true : false
 
 /**
- * Fold path segments POSIX-style: drop empty and current-directory (`.`) segments, and resolve
- * parent (`..`) segments against the accumulated output. Leading `..` segments are preserved on
- * relative paths but cannot escape an absolute root.
+ * Fold path segments POSIX-style: drop empty and current-directory (`.`) segments, and resolve parent (`..`) segments
+ * against the accumulated output. Leading `..` segments are preserved on relative paths but cannot escape an absolute
+ * root.
  */
 type NormalizeSegments<
 	Segments extends readonly string[],
@@ -94,11 +94,10 @@ type NormalizeSegments<
 	: Acc
 
 /**
- * Canonicalize a POSIX path: collapse repeated slashes, drop `.` segments, and resolve `..`
- * segments, always dropping any trailing slash. This is the type-level analog of how
- * `node:path.resolve` canonicalizes a path. An absolute path that resolves away all of its segments
- * becomes `/`; a relative path that resolves to nothing becomes `.`. See {@linkcode Normalize} for
- * the trailing-slash-preserving variant that mirrors `node:path.normalize`.
+ * Canonicalize a POSIX path: collapse repeated slashes, drop `.` segments, and resolve `..` segments, always dropping
+ * any trailing slash. This is the type-level analog of how `node:path.resolve` canonicalizes a path. An absolute path
+ * that resolves away all of its segments becomes `/`; a relative path that resolves to nothing becomes `.`. See
+ * {@linkcode Normalize} for the trailing-slash-preserving variant that mirrors `node:path.normalize`.
  */
 export type Resolve<S extends string> =
 	NormalizeSegments<Split<S, "/">, IsAbsolute<S>> extends infer Segments extends readonly string[]
@@ -115,11 +114,10 @@ export type Resolve<S extends string> =
 type HasTrailingSlash<S extends string> = S extends "/" ? false : S extends `${string}/` ? true : false
 
 /**
- * Normalize a POSIX path string the way `node:path` does: collapse repeated slashes, drop `.`
- * segments, and resolve `..` segments. A trailing slash is preserved (`foo/bar/` → `foo/bar/`,
- * `a/../` → `./`) exactly as `node:path.normalize` does, except on the root. An absolute path that
- * resolves away all of its segments becomes `/`; a relative path that resolves to nothing becomes
- * `.`.
+ * Normalize a POSIX path string the way `node:path` does: collapse repeated slashes, drop `.` segments, and resolve
+ * `..` segments. A trailing slash is preserved (`foo/bar/` → `foo/bar/`, `a/../` → `./`) exactly as
+ * `node:path.normalize` does, except on the root. An absolute path that resolves away all of its segments becomes `/`;
+ * a relative path that resolves to nothing becomes `.`.
  */
 export type Normalize<S extends string> =
 	Resolve<S> extends infer Core extends string

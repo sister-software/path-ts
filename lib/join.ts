@@ -5,6 +5,7 @@
  */
 
 import { posix } from "node:path"
+
 import type { PathBuilder } from "./path-builder.js"
 import type { Join, Normalize } from "./type-utils.js"
 

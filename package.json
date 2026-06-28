@@ -2,6 +2,16 @@
 	"name": "path-ts",
 	"version": "2.0.0",
 	"description": "Isomorphic type-safe path utilities.",
+	"keywords": [
+		"path",
+		"type-safe",
+		"typescript",
+		"utilities"
+	],
+	"homepage": "https://github.com/sister-software/path-ts",
+	"bugs": {
+		"url": "https://github.com/sister-software/path-ts/issues"
+	},
 	"license": "MIT",
 	"contributors": [
 		{
@@ -13,24 +23,13 @@
 		"type": "git",
 		"url": "https://github.com/sister-software/path-ts.git"
 	},
-	"bugs": {
-		"url": "https://github.com/sister-software/path-ts/issues"
-	},
-	"homepage": "https://github.com/sister-software/path-ts",
-	"scripts": {
-		"check-types": "tsc --build .",
-		"clean": "tsc -b --clean",
-		"compile": "NODE_OPTIONS=\"--max-old-space-size=3000\" tsc -b",
-		"lint": "run-s lint:prettier:check lint:eslint:check",
-		"lint:eslint:check": "eslint .",
-		"lint:eslint:fix": "eslint --fix .",
-		"lint:fix": "run-s lint:prettier:fix lint:eslint:fix",
-		"lint:prettier": "eslint .",
-		"lint:prettier:check": "prettier --cache --check -u .",
-		"lint:prettier:fix": "prettier --cache --write -u .",
-		"release": "release-it",
-		"test": "vitest"
-	},
+	"files": [
+		"out/index.d.ts",
+		"out/index.d.ts.map",
+		"out/index.js.map",
+		"out/index.js",
+		"out/lib/**/*"
+	],
 	"type": "module",
 	"exports": {
 		"./package.json": "./package.json",
@@ -45,45 +44,39 @@
 		"./resolve": "./out/lib/resolve.js",
 		"./type-utils": "./out/lib/type-utils.js"
 	},
-	"devDependencies": {
-		"@sister.software/eslint-config": "^8.0.1",
-		"@sister.software/prettier-config": "^8.0.1",
-		"@sister.software/tsconfig": "^8.0.1",
-		"@types/node": "^25.9.0",
-		"eslint": "^10.4.0",
-		"eslint-config-prettier": "^10.1.8",
-		"npm-run-all": "^4.1.5",
-		"prettier": "^3.8.3",
-		"prettier-plugin-jsdoc": "^1.8.0",
-		"prettier-plugin-organize-imports": "^4.3.0",
-		"prettier-plugin-packagejson": "^3.0.2",
-		"release-it": "^17.10.0",
-		"typescript": "^6.0.3",
-		"typescript-eslint": "^8.59.4",
-		"vitest": "^4.1.6"
-	},
-	"files": [
-		"out/index.d.ts",
-		"out/index.d.ts.map",
-		"out/index.js.map",
-		"out/index.js",
-		"out/lib/**/*"
-	],
-	"engines": {
-		"node": ">=18"
-	},
-	"packageManager": "yarn@4.5.1",
-	"prettier": "@sister.software/prettier-config",
-	"keywords": [
-		"path",
-		"typescript",
-		"type-safe",
-		"utilities"
-	],
 	"publishConfig": {
 		"access": "public",
 		"registry": "https://registry.npmjs.org"
 	},
+	"scripts": {
+		"check-types": "tsc --build .",
+		"clean": "tsc -b --clean",
+		"compile": "NODE_OPTIONS=\"--max-old-space-size=3000\" tsc -b",
+		"lint": "run-s lint:oxlint lint:oxfmt",
+		"lint:oxlint": "oxlint",
+		"lint:oxfmt": "oxfmt --check .",
+		"lint:fix": "run-s fix:oxlint format",
+		"fix:oxlint": "oxlint --fix",
+		"format": "oxfmt .",
+		"release": "release-it",
+		"test": "vitest"
+	},
+	"devDependencies": {
+		"@sister.software/oxfmt-config": "^9.1.0",
+		"@sister.software/oxlint-config": "^9.1.0",
+		"@sister.software/tsconfig": "^8.0.1",
+		"@types/node": "^25.9.0",
+		"npm-run-all": "^4.1.5",
+		"oxfmt": "0.56.0",
+		"oxlint": "1.71.0",
+		"release-it": "^17.10.0",
+		"typescript": "^6.0.3",
+		"vitest": "^4.1.6"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"packageManager": "yarn@4.5.1",
 	"release-it": {
 		"npm": {
 			"publish": true

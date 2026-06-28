@@ -5,13 +5,13 @@
  */
 
 import { posix } from "node:path"
+
 import { PathBuilder } from "./path-builder.js"
 import type { Join, PathDelimiter, Split, WithoutTrailingDelimiter } from "./type-utils.js"
 
 /**
- * Pluck the directory name from a path, e.g., the parent directory. Matches Node's `path.dirname`:
- * a top-level entry resolves to the root, a bare name resolves to the current directory, and the
- * root is its own parent.
+ * Pluck the directory name from a path, e.g., the parent directory. Matches Node's `path.dirname`: a top-level entry
+ * resolves to the root, a bare name resolves to the current directory, and the root is its own parent.
  *
  * ```ts
  * type Test1 = PluckDirname<"path/to/file"> // "path/to"
@@ -34,8 +34,8 @@ export type PluckDirname<T extends string, D extends PathDelimiter = "/"> =
 /**
  * Return the directory name of a path. Similar to the Unix dirname command.
  *
- * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
  * @returns The directory name of the path.
+ * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
  */
 export function dirname<T extends PathBuilder | string>(
 	path: T

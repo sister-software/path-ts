@@ -8,6 +8,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 
 import { posix } from "node:path"
+
 import type { PluckBasename } from "./basename.js"
 import type { PluckDirname } from "./dirname.js"
 import type { Join, Resolve } from "./type-utils.js"
@@ -35,9 +36,9 @@ export const kPathBuilder = Symbol.for("PathBuilder")
 /**
  * Type-safe path builder, backed by a plain string.
  *
- * Unlike a `URL`, a `PathBuilder` never percent-encodes its contents and never truncates at `#` or
- * `?`, so it round-trips arbitrary POSIX paths verbatim. Extending `String` gives instances the
- * full string method surface for free.
+ * Unlike a `URL`, a `PathBuilder` never percent-encodes its contents and never truncates at `#` or `?`, so it
+ * round-trips arbitrary POSIX paths verbatim. Extending `String` gives instances the full string method surface for
+ * free.
  */
 export class PathBuilder<S extends string = string> extends String implements PathBuilder<S> {
 	/**
@@ -48,8 +49,8 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 	public [kPathBuilder] = true
 
 	/**
-	 * Recognize PathBuilder instances — and their callable proxies — via the {@linkcode kPathBuilder}
-	 * brand, so `instanceof` works through the proxy returned by {@linkcode PathBuilder.from}.
+	 * Recognize PathBuilder instances — and their callable proxies — via the {@linkcode kPathBuilder} brand, so
+	 * `instanceof` works through the proxy returned by {@linkcode PathBuilder.from}.
 	 */
 	public static [Symbol.hasInstance](instance: unknown): boolean {
 		return instance != null && (instance as any)[kPathBuilder] === true

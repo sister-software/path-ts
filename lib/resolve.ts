@@ -5,6 +5,7 @@
  */
 
 import { posix } from "node:path"
+
 import { PathBuilder, type PathBuilderLike } from "./path-builder.js"
 import type { Join, Resolve } from "./type-utils.js"
 
@@ -18,8 +19,8 @@ export type ResolvePathString<S extends string, Root extends string = "/", Ss ex
 /**
  * Type-utility for resolving a relative path-like string to an absolute path.
  *
- * This is useful for converting relative paths to absolute paths, such as when creating
- * higher-order path builders that are relative to a project root.
+ * This is useful for converting relative paths to absolute paths, such as when creating higher-order path builders that
+ * are relative to a project root.
  */
 export type ResolvePathBuilderLike<
 	T extends PathBuilderLike = PathBuilderLike,
@@ -37,15 +38,16 @@ export type ResolvePathBuilderLike<
  *
  * Starting from leftmost {from} parameter, resolves {to} to an absolute path.
  *
- * If {to} isn't already absolute, {from} arguments are prepended in right to left order, until an
- * absolute path is found. If after using all {from} paths still no absolute path is found, the
- * current working directory is used as well. The resulting path is normalized, and trailing slashes
- * are removed unless the path gets resolved to the root directory.
+ * If {to} isn't already absolute, {from} arguments are prepended in right to left order, until an absolute path is
+ * found. If after using all {from} paths still no absolute path is found, the current working directory is used as
+ * well. The resulting path is normalized, and trailing slashes are removed unless the path gets resolved to the root
+ * directory.
  *
  * @param pathSegment1 A sequence of paths or path segments.
  * @param pathSegmentN A sequence of paths or path segments.
- * @throws {TypeError} If any of the arguments is not a string.
+ *
  * @returns An absolute path.
+ * @throws {TypeError} If any of the arguments is not a string.
  */
 export function resolvePathBuilder<T extends PathBuilderLike, Pn extends string[]>(
 	pathSegment1?: T,
@@ -70,9 +72,9 @@ export interface PathBuilderResolver<RuntimeRootAlias extends string = "~"> {
  *
  * This is useful for creating higher-order path builders that are relative to a project root.
  *
- * @param absoluteRuntimeRoot The absolute path to the root of the project. Note that this should be
- *   an absolute path, not a relative path. If you compile your project to a different location, you
- *   should use the absolute path to the root of the compiled project.
+ * @param absoluteRuntimeRoot The absolute path to the root of the project. Note that this should be an absolute path,
+ *   not a relative path. If you compile your project to a different location, you should use the absolute path to the
+ *   root of the compiled project.
  *
  * @returns A custom path builder resolver.
  */

@@ -5,6 +5,7 @@
  */
 
 import { posix } from "node:path"
+
 import { PathBuilder } from "./path-builder.js"
 import type { PathDelimiter, Split, WithoutTrailingDelimiter } from "./type-utils.js"
 
@@ -19,12 +20,13 @@ export type PluckBasename<T extends string, D extends PathDelimiter = "/"> =
 		: never
 
 /**
- * Return the last portion of a path. Similar to the Unix basename command. Often used to extract
- * the file name from a fully qualified path.
+ * Return the last portion of a path. Similar to the Unix basename command. Often used to extract the file name from a
+ * fully qualified path.
  *
  * @param path The path to evaluate.
- * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
+ *
  * @returns The base name of the path.
+ * @throws {TypeError} If path is not a string or {@linkcode PathBuilder}.
  */
 export function basename<T extends PathBuilder | string>(
 	path: T
