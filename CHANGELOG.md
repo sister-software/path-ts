@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- **`resolvePath(...)` and `createPathResolver(root)`** — string-returning siblings of `resolvePathBuilder` / `createPathBuilderResolver`. They resolve to a primitive `string` (branded with the resolved literal type) rather than a `PathBuilder`, so the result drops straight into `node:fs` and other path-string APIs without an explicit `.toString()`. Reach for `PathBuilder` / `resolvePathBuilder` when you need to keep appending across steps; use these at leaf and `fs` boundaries. (A `PathBuilder` is a `String` object, which `node:fs` rejects at runtime, so builders always needed conversion there.)
+
+## [2.0.1]
+
 ### Changed
 
 - **Relicensed from AGPL-3.0 to MIT.** `path-ts` is now permissively licensed.

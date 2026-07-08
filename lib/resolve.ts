@@ -58,6 +58,27 @@ export function resolvePathBuilder<T extends PathBuilderLike, Pn extends string[
 	return PathBuilder.from(resolved_string) as any
 }
 
+/**
+ * Resolve one or more path segments to a single absolute path string.
+ *
+ * The string-returning sibling of {@linkcode resolvePathBuilder}: the same resolution, but it returns a primitive
+ * `string` (branded with the resolved literal type) instead of a {@linkcode PathBuilder}. Prefer this at the boundaries
+ * of `node:fs` and other APIs that take a plain path string, where a builder would otherwise require an explicit
+ * `.toString()`.
+ *
+ * @param pathSegment1 A sequence of paths or path segments.
+ * @param pathSegmentN A sequence of paths or path segments.
+ *
+ * @returns An absolute path string.
+ * @throws {TypeError} If any of the arguments is not a string.
+ */
+export function resolvePath<T extends PathBuilderLike, Pn extends string[]>(
+	pathSegment1?: T,
+	...pathSegmentN: Pn
+): ResolvePathBuilderLike<T, "/{$CWD}", Pn> {
+	return posix.resolve(pathSegment1?.toString() || "", ...pathSegmentN) as any
+}
+
 export interface PathBuilderResolver<RuntimeRootAlias extends string = "~"> {
 	(): PathBuilder<RuntimeRootAlias>
 
@@ -86,6 +107,40 @@ export function createPathBuilderResolver<RuntimeRootAlias extends string = "~">
 	}
 
 	return customPathBuilderResolver as any
+}
+
+export interface PathResolver<RuntimeRootAlias extends string = "~"> {
+	(): RuntimeRootAlias
+
+	<T extends PathBuilderLike, Pn extends string[] = []>(
+		pathSegment1?: T,
+		...pathSegmentN: Pn
+	): ResolvePathBuilderLike<T, RuntimeRootAlias, Pn>
+}
+
+/**
+ * Create a custom path resolver with a bound root that returns absolute path strings.
+ *
+ * The string-returning sibling of {@linkcode createPathBuilderResolver}: the returned function resolves segments against
+ * `absoluteRuntimeRoot` and returns a primitive `string` (branded with the {@linkcode RuntimeRootAlias}) instead of a
+ * {@linkcode PathBuilder}. Because it returns a string, the result is not itself callable — use it for terminal, leaf
+ * paths (e.g. handing a path to `node:fs`); reach for {@linkcode createPathBuilderResolver} when you need to keep
+ * appending across multiple steps.
+ *
+ * @param absoluteRuntimeRoot The absolute path to the root of the project. Note that this should be an absolute path,
+ *   not a relative path. If you compile your project to a different location, you should use the absolute path to the
+ *   root of the compiled project.
+ *
+ * @returns A custom path resolver.
+ */
+export function createPathResolver<RuntimeRootAlias extends string = "~">(
+	absoluteRuntimeRoot: string
+): PathResolver<RuntimeRootAlias> {
+	const resolver = (...args: PathBuilderLike[]) => {
+		return resolvePath(absoluteRuntimeRoot, ...args.map((arg) => arg.toString()))
+	}
+
+	return resolver as any
 }
 
 export default resolvePathBuilder
