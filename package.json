@@ -58,7 +58,6 @@
 		"lint:fix": "run-s fix:oxlint format",
 		"fix:oxlint": "oxlint --fix",
 		"format": "oxfmt .",
-		"release": "release-it",
 		"test": "vitest"
 	},
 	"devDependencies": {
@@ -69,7 +68,6 @@
 		"npm-run-all": "^4.1.5",
 		"oxfmt": "0.56.0",
 		"oxlint": "1.71.0",
-		"release-it": "^17.10.0",
 		"typescript": "^6.0.3",
 		"vitest": "^4.1.6"
 	},
