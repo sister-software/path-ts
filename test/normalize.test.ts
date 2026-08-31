@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { join, type Normalize } from "path-ts"
+import { join, normalize, PathBuilder, type Normalize } from "path-ts"
 import { expect, expectTypeOf, test } from "vitest"
 
 test("join resolves parent segments", () => {
@@ -63,4 +63,21 @@ test("Normalize type mirrors POSIX normalization", () => {
 	expectTypeOf<Normalize<"a/..">>().toEqualTypeOf<".">()
 	expectTypeOf<Normalize<"/">>().toEqualTypeOf<"/">()
 	expectTypeOf<Normalize<"a/b/c">>().toEqualTypeOf<"a/b/c">()
+})
+
+test("normalize folds segments and keeps a relative path relative", () => {
+	const result = normalize("a/./b/../c/")
+
+	expect(result).toBe("a/c/")
+
+	expectTypeOf(result).toEqualTypeOf<"a/c/">()
+})
+
+test("normalize answers a path builder for a path builder", () => {
+	const result = normalize(PathBuilder.from("/a//b/../c"))
+
+	expect(result).toBeInstanceOf(PathBuilder)
+	expect(result.toString()).toBe("/a/c")
+
+	expectTypeOf(result).toEqualTypeOf<PathBuilder<"/a/c">>()
 })

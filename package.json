@@ -32,16 +32,20 @@
 	],
 	"type": "module",
 	"exports": {
-		"./package.json": "./package.json",
 		".": "./out/index.js",
 		"./basename": "./out/lib/basename.js",
 		"./dirname": "./out/lib/dirname.js",
 		"./extname": "./out/lib/extname.js",
 		"./format": "./out/lib/format.js",
+		"./is-absolute": "./out/lib/is-absolute.js",
 		"./join": "./out/lib/join.js",
+		"./normalize": "./out/lib/normalize.js",
+		"./package.json": "./package.json",
 		"./parse": "./out/lib/parse.js",
 		"./path-builder": "./out/lib/path-builder.js",
+		"./relative": "./out/lib/relative.js",
 		"./resolve": "./out/lib/resolve.js",
+		"./sep": "./out/lib/sep.js",
 		"./type-utils": "./out/lib/type-utils.js"
 	},
 	"publishConfig": {

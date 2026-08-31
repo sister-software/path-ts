@@ -4,9 +4,12 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.2.0]
 
 ### Added
+
+- **`basename(path, suffix)`** — the optional suffix `node:path` accepts, typed: `basename("a/b.txt", ".txt")` is `"b"`, and a suffix the name does not end with is left alone.
+- **`relative(from, to)`, `isAbsolute(path)`, `normalize(path)` and `sep`** — the remaining `node:path` operations a caller had to reach past `path-ts` for, each accepting a `PathBuilder` or a string. `relative` types its answer as a literal when both inputs are absolute literals (`Relative<"/a/b", "/a/c/d">` is `"../c/d"`) and as `string` otherwise, since a relative input resolves against the runtime's working directory. `isAbsolute` answers a boolean literal for a literal path. `normalize` keeps a trailing separator and keeps a relative path relative, where `resolvePath` would not. `sep` is the literal `"/"` — POSIX everywhere is the package's contract.
 
 - **`resolvePath(...)` and `createPathResolver(root)`** — string-returning siblings of `resolvePathBuilder` / `createPathBuilderResolver`. They resolve to a primitive `string` (branded with the resolved literal type) rather than a `PathBuilder`, so the result drops straight into `node:fs` and other path-string APIs without an explicit `.toString()`. Reach for `PathBuilder` / `resolvePathBuilder` when you need to keep appending across steps; use these at leaf and `fs` boundaries. (A `PathBuilder` is a `String` object, which `node:fs` rejects at runtime, so builders always needed conversion there.)
 

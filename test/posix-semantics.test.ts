@@ -4,8 +4,8 @@
  * @author Teffen Ellis, et al.
  */
 
-import { basename, dirname, extname, join } from "path-ts"
-import { expect, test } from "vitest"
+import { basename, dirname, extname, join, sep } from "path-ts"
+import { expect, expectTypeOf, test } from "vitest"
 
 // path-ts uses POSIX path semantics on every platform so that the always-"/" types match the
 // runtime everywhere (including Windows and the browser). On a POSIX host these assertions also
@@ -24,4 +24,10 @@ test("backslashes are treated as ordinary path characters, not separators", () =
 
 test("a Windows drive-style path is not split on backslashes", () => {
 	expect(basename("C:\\Users\\file.txt")).toBe("C:\\Users\\file.txt")
+})
+
+test("the separator is the forward slash, as a literal", () => {
+	expect(sep).toBe("/")
+
+	expectTypeOf(sep).toEqualTypeOf<"/">()
 })
