@@ -17,7 +17,7 @@ Package manager is **Yarn 4 (Berry)** with the `node-modules` linker — use `ya
 - `yarn test run test/join.test.ts` — run one test file once.
 - `yarn test join` — filter to tests matching a name pattern.
 - `yarn lint` / `yarn lint:fix` — Prettier + ESLint (check / autofix). Prettier owns formatting; ESLint owns correctness.
-- `yarn release` — `release-it`, publishes to npm.
+- Release — two GitHub Actions dispatches; nothing runs locally. `main` is protected, so the bump lands via an auto-merging PR (`gh workflow run publish.yml -f mode=prepare -f version=minor`), then the merged commit is tagged and published (`gh workflow run publish.yml -f mode=publish`). See `.github/workflows/publish.yml`.
 
 Notes:
 
