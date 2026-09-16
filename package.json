@@ -31,22 +31,65 @@
 		"out/lib/**/*"
 	],
 	"type": "module",
+	"types": "./out/index.d.ts",
 	"exports": {
-		".": "./out/index.js",
-		"./basename": "./out/lib/basename.js",
-		"./dirname": "./out/lib/dirname.js",
-		"./extname": "./out/lib/extname.js",
-		"./format": "./out/lib/format.js",
-		"./is-absolute": "./out/lib/is-absolute.js",
-		"./join": "./out/lib/join.js",
-		"./normalize": "./out/lib/normalize.js",
+		".": {
+			"types": "./out/index.d.ts",
+			"default": "./out/index.js"
+		},
+		"./basename": {
+			"types": "./out/lib/basename.d.ts",
+			"default": "./out/lib/basename.js"
+		},
+		"./dirname": {
+			"types": "./out/lib/dirname.d.ts",
+			"default": "./out/lib/dirname.js"
+		},
+		"./extname": {
+			"types": "./out/lib/extname.d.ts",
+			"default": "./out/lib/extname.js"
+		},
+		"./format": {
+			"types": "./out/lib/format.d.ts",
+			"default": "./out/lib/format.js"
+		},
+		"./is-absolute": {
+			"types": "./out/lib/is-absolute.d.ts",
+			"default": "./out/lib/is-absolute.js"
+		},
+		"./join": {
+			"types": "./out/lib/join.d.ts",
+			"default": "./out/lib/join.js"
+		},
+		"./normalize": {
+			"types": "./out/lib/normalize.d.ts",
+			"default": "./out/lib/normalize.js"
+		},
 		"./package.json": "./package.json",
-		"./parse": "./out/lib/parse.js",
-		"./path-builder": "./out/lib/path-builder.js",
-		"./relative": "./out/lib/relative.js",
-		"./resolve": "./out/lib/resolve.js",
-		"./sep": "./out/lib/sep.js",
-		"./type-utils": "./out/lib/type-utils.js"
+		"./parse": {
+			"types": "./out/lib/parse.d.ts",
+			"default": "./out/lib/parse.js"
+		},
+		"./path-builder": {
+			"types": "./out/lib/path-builder.d.ts",
+			"default": "./out/lib/path-builder.js"
+		},
+		"./relative": {
+			"types": "./out/lib/relative.d.ts",
+			"default": "./out/lib/relative.js"
+		},
+		"./resolve": {
+			"types": "./out/lib/resolve.d.ts",
+			"default": "./out/lib/resolve.js"
+		},
+		"./sep": {
+			"types": "./out/lib/sep.d.ts",
+			"default": "./out/lib/sep.js"
+		},
+		"./type-utils": {
+			"types": "./out/lib/type-utils.d.ts",
+			"default": "./out/lib/type-utils.js"
+		}
 	},
 	"publishConfig": {
 		"access": "public",
