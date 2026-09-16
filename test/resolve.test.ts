@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { createPathResolver, resolvePath } from "path-ts"
+import { createPathResolver, PathBuilder, resolvePath } from "path-ts"
 import { expect, expectTypeOf, test } from "vitest"
 
 test("resolvePath returns a primitive string, not a builder", () => {
@@ -22,6 +22,14 @@ test("resolvePath normalizes parent segments", () => {
 	expect(result).toBe("/foo")
 
 	expectTypeOf(result).toEqualTypeOf<"/foo">()
+})
+
+test("resolvePath accepts a PathBuilder segment", () => {
+	const segment = PathBuilder.from("/data")("public")
+	const result = resolvePath("/ignored", segment)
+
+	expect(result).toBe("/data/public")
+	expectTypeOf(result).toEqualTypeOf<"/data/public">()
 })
 
 test("createPathResolver yields strings from a bound root", () => {

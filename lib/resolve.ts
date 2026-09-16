@@ -6,15 +6,33 @@
 
 import { posix } from "node:path"
 
-import { PathBuilder, type PathBuilderLike } from "./path-builder.js"
+import { PathBuilder, type PathBuilderLike, type UnwrapPathBuilder } from "./path-builder.js"
 import type { Join, Resolve } from "./type-utils.js"
+
+type UnwrapPathBuilderSegments<S extends readonly PathBuilderLike[]> = {
+	[K in keyof S]: S[K] extends PathBuilderLike ? UnwrapPathBuilder<S[K]> : never
+} extends infer U extends string[]
+	? U
+	: never
+
+/**
+ * Apply `path.resolve`'s left-to-right reset rule: an absolute segment discards everything before it.
+ */
+type ResolvePathSegments<Segments extends readonly string[], Acc extends string> = Segments extends readonly [
+	infer Head extends string,
+	...infer Tail extends readonly string[],
+]
+	? ResolvePathSegments<Tail, Head extends `/${string}` ? Head : `${Acc}/${Head}`>
+	: Resolve<Acc>
 
 /**
  * Type-utility for resolving a relative path-like string to an absolute path.
  */
-export type ResolvePathString<S extends string, Root extends string = "/", Ss extends string[] = []> = Resolve<
-	S extends `/${string}` ? Join<[S, ...Ss], "/"> : `${Root}/${Join<[S, ...Ss], "/">}`
->
+export type ResolvePathString<
+	S extends string,
+	Root extends string = "/",
+	Ss extends PathBuilderLike[] = [],
+> = ResolvePathSegments<[S, ...UnwrapPathBuilderSegments<Ss>], Root>
 
 /**
  * Type-utility for resolving a relative path-like string to an absolute path.
@@ -25,7 +43,7 @@ export type ResolvePathString<S extends string, Root extends string = "/", Ss ex
 export type ResolvePathBuilderLike<
 	T extends PathBuilderLike = PathBuilderLike,
 	Root extends string = "/",
-	Pn extends string[] = [],
+	Pn extends PathBuilderLike[] = [],
 > =
 	T extends PathBuilder<infer S>
 		? ResolvePathString<S, Root, Pn>
@@ -49,11 +67,14 @@ export type ResolvePathBuilderLike<
  * @returns An absolute path.
  * @throws {TypeError} If any of the arguments is not a string.
  */
-export function resolvePathBuilder<T extends PathBuilderLike, Pn extends string[]>(
+export function resolvePathBuilder<T extends PathBuilderLike, Pn extends PathBuilderLike[]>(
 	pathSegment1?: T,
 	...pathSegmentN: Pn
 ): PathBuilder<ResolvePathBuilderLike<T, "/{$CWD}", Pn>> {
-	const resolved_string = posix.resolve(pathSegment1?.toString() || "", ...pathSegmentN)
+	const resolved_string = posix.resolve(
+		pathSegment1?.toString() || "",
+		...pathSegmentN.map((segment) => segment.toString())
+	)
 
 	return PathBuilder.from(resolved_string) as any
 }
@@ -72,17 +93,17 @@ export function resolvePathBuilder<T extends PathBuilderLike, Pn extends string[
  * @returns An absolute path string.
  * @throws {TypeError} If any of the arguments is not a string.
  */
-export function resolvePath<T extends PathBuilderLike, Pn extends string[]>(
+export function resolvePath<T extends PathBuilderLike, Pn extends PathBuilderLike[]>(
 	pathSegment1?: T,
 	...pathSegmentN: Pn
 ): ResolvePathBuilderLike<T, "/{$CWD}", Pn> {
-	return posix.resolve(pathSegment1?.toString() || "", ...pathSegmentN) as any
+	return posix.resolve(pathSegment1?.toString() || "", ...pathSegmentN.map((segment) => segment.toString())) as any
 }
 
 export interface PathBuilderResolver<RuntimeRootAlias extends string = "~"> {
 	(): PathBuilder<RuntimeRootAlias>
 
-	<T extends PathBuilderLike, Pn extends string[] = []>(
+	<T extends PathBuilderLike, Pn extends PathBuilderLike[] = []>(
 		pathSegment1?: T,
 		...pathSegmentN: Pn
 	): PathBuilder<ResolvePathBuilderLike<T, RuntimeRootAlias, Pn>>
@@ -112,7 +133,7 @@ export function createPathBuilderResolver<RuntimeRootAlias extends string = "~">
 export interface PathResolver<RuntimeRootAlias extends string = "~"> {
 	(): RuntimeRootAlias
 
-	<T extends PathBuilderLike, Pn extends string[] = []>(
+	<T extends PathBuilderLike, Pn extends PathBuilderLike[] = []>(
 		pathSegment1?: T,
 		...pathSegmentN: Pn
 	): ResolvePathBuilderLike<T, RuntimeRootAlias, Pn>
