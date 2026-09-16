@@ -105,6 +105,7 @@
 		"lint:fix": "run-s fix:oxlint format",
 		"fix:oxlint": "oxlint --fix",
 		"format": "oxfmt .",
+		"release": "release-it",
 		"test": "vitest"
 	},
 	"devDependencies": {
