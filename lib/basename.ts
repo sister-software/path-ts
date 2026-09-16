@@ -6,7 +6,7 @@
 
 import { posix } from "node:path"
 
-import { PathBuilder } from "./path-builder.js"
+import type { PathBuilder } from "./path-builder.js"
 import type { PathDelimiter, Split, WithoutTrailingDelimiter } from "./type-utils.js"
 
 /**
@@ -43,12 +43,12 @@ export type PluckBasenameWithoutSuffix<T extends string, Suffix extends string> 
  */
 export function basename<T extends PathBuilder | string>(
 	path: T
-): T extends PathBuilder<infer U> ? PathBuilder<PluckBasename<U>> : T extends string ? PluckBasename<T> : never
+): T extends PathBuilder<infer U> ? PluckBasename<U> : T extends string ? PluckBasename<T> : never
 export function basename<T extends PathBuilder | string, Suffix extends string>(
 	path: T,
 	suffix: Suffix
 ): T extends PathBuilder<infer U>
-	? PathBuilder<PluckBasenameWithoutSuffix<U, Suffix>>
+	? PluckBasenameWithoutSuffix<U, Suffix>
 	: T extends string
 		? PluckBasenameWithoutSuffix<T, Suffix>
 		: never

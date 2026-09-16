@@ -40,7 +40,9 @@ export type PluckDirname<T extends string, D extends PathDelimiter = "/"> =
 export function dirname<T extends PathBuilder | string>(
 	path: T
 ): T extends PathBuilder<infer U> ? PathBuilder<PluckDirname<U>> : T extends string ? PluckDirname<T> : never {
-	return posix.dirname(path.toString()) as any
+	const directoryName = posix.dirname(path.toString())
+
+	return (path instanceof PathBuilder ? PathBuilder.from(directoryName) : directoryName) as any
 }
 
 export default dirname

@@ -53,6 +53,11 @@ jobs:
       - name: Test
         run: yarn test --run
 
+      # Verify the documented bring-your-own-polyfill path produces a browser bundle with no
+      # unresolved Node builtin.
+      - name: Build browser fixture
+        run: yarn test:browser
+
       # Exercise the `files` array so a missing build artifact fails here, not in a consumer's
       # node_modules.
       - name: Pack and inspect the tarball
@@ -60,3 +65,29 @@ jobs:
           npm pack --dry-run
           test -f out/index.js || { echo "::error::out/index.js missing — compile did not produce the published entry"; exit 1; }
           test -f out/index.d.ts || { echo "::error::out/index.d.ts missing — no types would ship"; exit 1; }
+
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Enable Corepack (yarn 4)
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # `compile` uses cross-env so its memory limit works in PowerShell as well as POSIX shells.
+      - name: Compile
+        run: yarn compile
+
+      - name: Test
+        run: yarn test --run

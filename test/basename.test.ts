@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { basename } from "path-ts"
+import { basename, PathBuilder } from "path-ts"
 import { expect, expectTypeOf, test } from "vitest"
 
 test("Relative path", () => {
@@ -67,4 +67,11 @@ test("a plain-string suffix answers string", () => {
 	const suffix: string = ".txt"
 
 	expectTypeOf(basename("path/to/file.txt", suffix)).toEqualTypeOf<string>()
+})
+
+test("a path builder answers a primitive basename", () => {
+	const result = basename(PathBuilder.from("/path/to/file.txt"), ".txt")
+
+	expect(result).toBe("file")
+	expectTypeOf(result).toEqualTypeOf<"file">()
 })

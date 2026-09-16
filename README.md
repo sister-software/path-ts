@@ -44,11 +44,31 @@ When configuring TypeScript, you'll have better results if you enable `strict` m
 
 ## POSIX semantics everywhere
 
-`path-ts` uses POSIX path semantics (the `/` separator) on every platform, including Windows and the browser. This is what lets the literal types — which are always `/`-based — match the runtime everywhere. If you need Windows (`\`) semantics, use Node's built-in `path.win32` directly.
+`path-ts` uses POSIX path semantics (the `/` separator) on every supported runtime, including Windows and configured browser bundles. This is what lets the literal types — which are always `/`-based — match the runtime everywhere. If you need Windows (`\`) semantics, use Node's built-in `path.win32` directly.
 
-## Browser Usage
+## Browser usage (bring your own polyfill)
 
-`path-ts` depends on Node's built-in `path` module, however it can be polyfilled in a browser in ESBuild or Webpack allowing you to use the same type-safe path utilities in both the browser and Node.
+`path-ts` imports `node:path` and therefore does not run in a browser without bundler configuration. It deliberately does
+not bundle a path implementation: applications should provide one appropriate for their bundler. The implementation
+must provide the POSIX `path` API (`posix.join`, `posix.resolve`, and the other `posix` methods used by this package).
+
+For example, install a browser-compatible path implementation such as `path-browserify`, then alias `node:path` to it
+in your bundler. In Vite, the configuration is:
+
+```ts
+import { defineConfig } from "vite"
+
+export default defineConfig({
+	resolve: {
+		alias: {
+			"node:path": "path-browserify",
+		},
+	},
+})
+```
+
+Other bundlers use the same idea but have different configuration syntax. This package's POSIX-only behavior is the
+same in Node and in a correctly configured browser bundle.
 
 # Path Builder API
 
@@ -136,7 +156,6 @@ export function packageOutPathBuilder<P extends MonoRepoPackageName, S extends s
 - **POSIX only.** Types and runtime both assume `/`. Windows (`\`) paths are treated as ordinary characters, not separators. Use `node:path.win32` if you need Windows semantics.
 - **`PathBuilder.from` does not model the current working directory.** At runtime it resolves relative inputs against `process.cwd()`, but the type cannot know the cwd, so the type of `PathBuilder.from("relative")` stays relative. To get a sound absolute type, start from an absolute path or use `createPathBuilderResolver` with a bound root.
 - **Very long paths.** The recursive normalization types are bounded by the TypeScript instantiation-depth limit. Realistic paths are fine; pathological inputs fall back to `string`.
-- **`parse().name` for dotfiles.** `extname` correctly returns `""` for dotfiles like `.gitignore`, but the `name` field of `parse()` does not yet special-case the leading dot.
 
 # License
 

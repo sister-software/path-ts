@@ -98,7 +98,7 @@
 	"scripts": {
 		"check-types": "tsc --build .",
 		"clean": "tsc -b --clean",
-		"compile": "NODE_OPTIONS=\"--max-old-space-size=3000\" tsc -b",
+		"compile": "cross-env NODE_OPTIONS=--max-old-space-size=3000 tsc -b",
 		"lint": "run-s lint:oxlint lint:oxfmt",
 		"lint:oxlint": "oxlint",
 		"lint:oxfmt": "oxfmt --check .",
@@ -106,18 +106,23 @@
 		"fix:oxlint": "oxlint --fix",
 		"format": "oxfmt .",
 		"release": "release-it",
-		"test": "vitest"
+		"test": "vitest",
+		"test:browser": "vite build --config test/browser/vite.config.ts"
 	},
 	"devDependencies": {
 		"@sister.software/oxfmt-config": "^9.1.0",
 		"@sister.software/oxlint-config": "^9.1.0",
 		"@sister.software/tsconfig": "^9.0.0",
 		"@types/node": "^25.9.0",
+		"@types/path-browserify": "^1",
+		"cross-env": "^7.0.3",
 		"npm-run-all": "^4.1.5",
 		"oxfmt": "0.56.0",
 		"oxlint": "1.71.0",
+		"path-browserify": "^1.0.1",
 		"release-it": "^21.0.1",
 		"typescript": "^6.0.3",
+		"vite": "^6.0.0",
 		"vitest": "^4.1.6"
 	},
 	"engines": {

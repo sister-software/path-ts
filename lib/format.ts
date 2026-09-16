@@ -7,22 +7,23 @@
 import { posix } from "node:path"
 
 import type { ParsedPath } from "./parse.js"
-import type { Join, PathDelimiter } from "./type-utils.js"
-
-export type FormatParsedPath<T extends ParsedPath<string>, D extends PathDelimiter = "/"> = Join<
-	[T["dir"], T["base"]],
-	D
->
+export type FormatParsedPath<T extends ParsedPath<string>> = T["dir"] extends ""
+	? T["root"] extends "/"
+		? `/${T["base"]}`
+		: T["base"]
+	: T["dir"] extends "/"
+		? `/${T["base"]}`
+		: `${T["dir"]}/${T["base"]}`
 
 /**
- * Return the directory name of a path. Similar to the Unix dirname command.
+ * Format a parsed POSIX path.
  *
  * @param parsedPath The parsed path object to format.
  *
  * @returns The formatted path.
  * @throws {TypeError} If input is not a {@linkcode ParsedPath}
  */
-export function format<T extends string>(parsedPath: ParsedPath<T>): FormatParsedPath<ParsedPath<T>> {
+export function format<T extends ParsedPath<string>>(parsedPath: T): FormatParsedPath<T> {
 	return posix.format(parsedPath) as any
 }
 

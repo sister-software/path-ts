@@ -45,7 +45,15 @@ export type PluckFileExtension<T extends string> = ExtnameOfBasename<PluckBasena
  * Note that this type retains the full given path. To strip the path and return only the file name, use
  * `PluckBaseFileName`.
  */
-export type PluckFileName<T extends string> = T extends `${infer FileName}.${string}` ? FileName : T
+export type PluckFileName<T extends string> = string extends T
+	? string
+	: PluckFileExtension<T> extends infer Extension extends string
+		? Extension extends ""
+			? T
+			: T extends `${infer FileName}${Extension}`
+				? FileName
+				: T
+		: never
 
 /**
  * Plucks the base file name from a path without the extension.

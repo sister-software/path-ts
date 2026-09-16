@@ -31,7 +31,7 @@ export interface PathBuilder<S extends string> extends String {
  *
  * @internal
  */
-export const kPathBuilder = Symbol.for("PathBuilder")
+export const kPathBuilder = Symbol.for("path-ts.PathBuilder")
 
 /**
  * Type-safe path builder, backed by a plain string.
@@ -42,13 +42,6 @@ export const kPathBuilder = Symbol.for("PathBuilder")
  */
 export class PathBuilder<S extends string = string> extends String implements PathBuilder<S> {
 	/**
-	 * Runtime class identifier for the PathBuilder class.
-	 *
-	 * @internal
-	 */
-	public [kPathBuilder] = true
-
-	/**
 	 * Recognize PathBuilder instances — and their callable proxies — via the {@linkcode kPathBuilder} brand, so
 	 * `instanceof` works through the proxy returned by {@linkcode PathBuilder.from}.
 	 */
@@ -58,6 +51,10 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 
 	protected constructor(path: S) {
 		super(path)
+		// Keep the runtime brand off the public instance type. Consumers may receive builders through two physical copies of
+		// path-ts (for example, one direct and one nested below a dependency); a public unique-symbol property would make
+		// their otherwise identical builders nominally incompatible to TypeScript.
+		Object.defineProperty(this, kPathBuilder, { value: true })
 	}
 
 	/**
@@ -84,8 +81,8 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 	/**
 	 * Base name of a path. Similar to the Unix basename command.
 	 */
-	public basename(): PathBuilder<PluckBasename<S>> {
-		return PathBuilder.from(posix.basename(this.toString())) as any
+	public basename(): PluckBasename<S> {
+		return posix.basename(this.toString()) as any
 	}
 
 	public get [Symbol.toStringTag](): S {

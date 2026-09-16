@@ -4,8 +4,16 @@
  * @author Teffen Ellis, et al.
  */
 
-import { PathBuilder } from "path-ts"
+import { kPathBuilder, PathBuilder, type Join, type Resolve } from "path-ts"
 import { expect, expectTypeOf, test } from "vitest"
+
+declare const foreignPathBuilderBrand: unique symbol
+
+/** Models the public shape emitted by another physical installation of path-ts. */
+type ForeignPathBuilder<S extends string> = Omit<PathBuilder<S>, typeof kPathBuilder> & {
+	<T extends Array<string | number>>(...additionalPathSegments: T): PathBuilder<Resolve<Join<[S, ...T], "/">>>
+	readonly [foreignPathBuilderBrand]: true
+}
 
 test("Path builder can build children", () => {
 	const resultBuilder = PathBuilder.from("/foo")
@@ -21,6 +29,16 @@ test("Path builder can build children", () => {
 	expect(resuiltBuilderGrandchild.toString(), "Builder child creates grandchild").toBe("/foo/bar/baz/qux")
 
 	expectTypeOf(resuiltBuilderGrandchild).toEqualTypeOf<PathBuilder<"/foo/bar/baz/qux">>()
+})
+
+test("Path builder brands remain runtime-only across package copies", () => {
+	const builder = PathBuilder.from("/foo")
+
+	// `from` recognizes builders from a different physical copy through the shared runtime symbol.
+	expect(PathBuilder.from(builder)).toBe(builder)
+
+	// A distinct `unique symbol` from another declaration file must not make its public builder type incompatible.
+	expectTypeOf<ForeignPathBuilder<"/foo"> extends PathBuilder<"/foo"> ? true : false>().toEqualTypeOf<true>()
 })
 
 test("Path builder normalizes parent segments in both value and type", () => {

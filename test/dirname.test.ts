@@ -4,7 +4,7 @@
  * @author Teffen Ellis, et al.
  */
 
-import { dirname } from "path-ts"
+import { dirname, PathBuilder } from "path-ts"
 import { expect, expectTypeOf, test } from "vitest"
 
 test("Directory path", () => {
@@ -61,4 +61,12 @@ test("Single relative segment resolves to current directory", () => {
 	expect(result, "Parent of a bare name is the current directory").toBe(".")
 
 	expectTypeOf(result).toEqualTypeOf<".">()
+})
+
+test("a path builder answers a path builder", () => {
+	const result = dirname(PathBuilder.from("/path/to/file"))
+
+	expect(result).toBeInstanceOf(PathBuilder)
+	expect(result.toString()).toBe("/path/to")
+	expectTypeOf(result).toEqualTypeOf<PathBuilder<"/path/to">>()
 })
