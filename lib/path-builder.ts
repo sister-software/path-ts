@@ -14,6 +14,24 @@ import type { PluckDirname } from "./dirname.js"
 import type { Join, Resolve } from "./type-utils.js"
 
 /**
+ * A segment accepted when extending a path builder.
+ */
+export type PathBuilderSegment = string | number | PathBuilder
+
+type UnwrapPathBuilderSegments<S extends readonly PathBuilderSegment[]> = {
+	[K in keyof S]: S[K] extends PathBuilder<infer Path> ? Path : S[K]
+} extends infer Segments extends Array<string | number>
+	? Segments
+	: never
+
+export type ResolvePathBuilderSegments<Segments extends Array<string | number>, Acc extends string> = Segments extends [
+	infer Head extends string | number,
+	...infer Tail extends Array<string | number>,
+]
+	? ResolvePathBuilderSegments<Tail, Head extends `/${string}` ? Head : `${Acc}/${Head}`>
+	: Resolve<Acc>
+
+/**
  * Type-safe path builder.
  *
  * @template S - The type of the path string.
@@ -23,8 +41,15 @@ export interface PathBuilder<S extends string> extends String {
 	 * Append additional path segments to the current path.
 	 */
 	// Note: We shadow PathBuilder to allow instances of PathBuilder to be used as a function.
-	<T extends Array<string | number>>(...additionalPathSegments: T): PathBuilder<Resolve<Join<[S, ...T], "/">>>
+	<T extends PathBuilderSegment[]>(
+		...additionalPathSegments: T
+	): PathBuilder<ResolvePathBuilderSegments<UnwrapPathBuilderSegments<T>, S>>
 }
+
+/**
+ * A path value supplied when the builder is read.
+ */
+export type PathBuilderSource = () => string
 
 /**
  * Runtime class identifier for the PathBuilder class.
@@ -69,6 +94,13 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 	 */
 	public override valueOf(): S {
 		return super.valueOf() as S
+	}
+
+	/**
+	 * Return the primitive path used by JSON serialization.
+	 */
+	public toJSON(): S {
+		return this.toString()
 	}
 
 	/**
@@ -133,32 +165,46 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 			return pathBuilderLike as any
 		}
 
-		const resolvedPath = posix.resolve(
-			// ---
-			pathBuilderLike.toString(),
-			...pathSegmentN.map((pathSegment) => pathSegment.toString())
-		)
+		return PathBuilder.fromSource(() =>
+			posix.resolve(pathBuilderLike.toString(), ...pathSegmentN.map((pathSegment) => pathSegment.toString()))
+		) as any
+	}
 
-		const instance = new PathBuilder(resolvedPath)
-		const toString = () => instance.toString()
+	/**
+	 * Create a builder whose value is read from a source on demand.
+	 *
+	 * Descendants retain the source, so a value created before the source changes resolves against the current value when
+	 * it is read.
+	 */
+	public static fromSource<S extends string>(source: PathBuilderSource): PathBuilder<S> {
+		const resolve = () => posix.resolve(source()) as S
+		const instance = new PathBuilder("" as S)
+		const toString = () => resolve()
 
 		const pathBuilderProxy = new Proxy(PathBuilder.from, {
-			apply(target, _thisArg, args) {
-				return target(resolvedPath, ...args)
+			apply(_target, _thisArg, args: PathBuilderSegment[]) {
+				return PathBuilder.fromSource(() =>
+					posix.resolve(resolve(), ...args.map((pathSegment) => pathSegment.toString()))
+				)
 			},
 
 			get(target, prop) {
 				switch (prop) {
 					case Symbol.toPrimitive:
 					case Symbol.for("nodejs.util.inspect.custom"):
+					case "toJSON":
 					case "toString":
 					case "valueOf":
 						return toString
+					case "length":
+						return toString().length
 					case "name":
 						return "PathBuilderProxy"
 				}
 
 				if (prop === Symbol.toStringTag) return toString()
+
+				if (typeof prop === "string" && /^(?:0|[1-9]\d*)$/.test(prop)) return toString()[Number(prop)]
 
 				if (prop in instance) {
 					return (instance as any)[prop]

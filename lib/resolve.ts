@@ -100,34 +100,32 @@ export function resolvePath<T extends PathBuilderLike, Pn extends PathBuilderLik
 	return posix.resolve(pathSegment1?.toString() || "", ...pathSegmentN.map((segment) => segment.toString())) as any
 }
 
-export interface PathBuilderResolver<RuntimeRootAlias extends string = "~"> {
-	(): PathBuilder<RuntimeRootAlias>
+export type PathBuilderRoot = string | (() => string)
 
-	<T extends PathBuilderLike, Pn extends PathBuilderLike[] = []>(
-		pathSegment1?: T,
-		...pathSegmentN: Pn
-	): PathBuilder<ResolvePathBuilderLike<T, RuntimeRootAlias, Pn>>
-}
+/**
+ * A path builder whose runtime root has a type-level alias.
+ *
+ * @deprecated Use `PathBuilder<RuntimeRootAlias>`. This alias remains for source compatibility.
+ */
+export type PathBuilderResolver<RuntimeRootAlias extends string = "~"> = PathBuilder<RuntimeRootAlias>
 
 /**
  * Create a custom path builder resolver with a bound root.
  *
  * This is useful for creating higher-order path builders that are relative to a project root.
  *
- * @param absoluteRuntimeRoot The absolute path to the root of the project. Note that this should be an absolute path,
- *   not a relative path. If you compile your project to a different location, you should use the absolute path to the
- *   root of the compiled project.
+ * @param absoluteRuntimeRoot The absolute path to the root of the project, or a function that supplies it. A supplier
+ *   is read whenever the builder or one of its descendants is converted to a primitive path. The supplied path should
+ *   be absolute.
  *
  * @returns A custom path builder resolver.
  */
 export function createPathBuilderResolver<RuntimeRootAlias extends string = "~">(
-	absoluteRuntimeRoot: string
-): PathBuilderResolver<RuntimeRootAlias> {
-	const customPathBuilderResolver = (...args: PathBuilderLike[]) => {
-		return resolvePathBuilder(absoluteRuntimeRoot, ...args.map((arg) => arg.toString()))
-	}
+	absoluteRuntimeRoot: PathBuilderRoot
+): PathBuilder<RuntimeRootAlias> {
+	const source = typeof absoluteRuntimeRoot === "function" ? absoluteRuntimeRoot : () => absoluteRuntimeRoot
 
-	return customPathBuilderResolver as any
+	return PathBuilder.fromSource(source)
 }
 
 export interface PathResolver<RuntimeRootAlias extends string = "~"> {

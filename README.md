@@ -82,6 +82,9 @@ const builder = PathBuilder.from("/foo")
 // Builders act like immutable strings that can be appended by calling them like functions...
 const childBuilder = builder("bar")
 console.log(childBuilder.toString()) // '/foo/bar'
+
+// Builders serialize as their primitive path.
+JSON.stringify({ path: childBuilder }) // '{"path":"/foo/bar"}'
 ```
 
 ## Repo relative paths
@@ -119,6 +122,17 @@ type RepoRootAbsolutePath = RepoRootAlias
  * Path builder relative to the repo root.
  */
 export const repoRootPathBuilder = createPathBuilderResolver<RepoRootAlias>(RepoRootAbsolutePath)
+```
+
+`createPathBuilderResolver` returns an ordinary `PathBuilder` whose runtime root carries the given type-level alias.
+It also accepts a root supplier for values that can change after module evaluation:
+
+```ts
+const dataRoot = createPathBuilderResolver<"~data">(() => process.env.DATA_ROOT ?? "/var/lib/app")
+const indexPath = dataRoot("index.db")
+
+// The root supplier is read here, so `indexPath` follows later environment changes.
+console.log(indexPath.toString())
 ```
 
 ### Usage

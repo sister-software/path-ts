@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- `PathBuilder.toJSON()` serializes a builder as its primitive path.
+- `createPathBuilderResolver(root)` accepts a root supplier and returns an ordinary `PathBuilder`. The supplier is read
+  when the builder or one of its descendants is converted to a primitive path.
+
+### Fixed
+
+- Calling a `PathBuilder` with an absolute string or another absolute builder now models the runtime reset in its
+  result type instead of retaining the preceding root.
+
 ## [2.2.0]
 
 ### Added

@@ -4,14 +4,25 @@
  * @author Teffen Ellis, et al.
  */
 
-import { kPathBuilder, PathBuilder, type Join, type Resolve } from "path-ts"
+import { kPathBuilder, PathBuilder, type PathBuilderSegment, type ResolvePathBuilderSegments } from "path-ts"
 import { expect, expectTypeOf, test } from "vitest"
 
 declare const foreignPathBuilderBrand: unique symbol
 
 /** Models the public shape emitted by another physical installation of path-ts. */
 type ForeignPathBuilder<S extends string> = Omit<PathBuilder<S>, typeof kPathBuilder> & {
-	<T extends Array<string | number>>(...additionalPathSegments: T): PathBuilder<Resolve<Join<[S, ...T], "/">>>
+	<T extends PathBuilderSegment[]>(
+		...additionalPathSegments: T
+	): PathBuilder<
+		ResolvePathBuilderSegments<
+			{ [K in keyof T]: T[K] extends PathBuilder<infer Path> ? Path : T[K] } extends infer Segments extends Array<
+				string | number
+			>
+				? Segments
+				: never,
+			S
+		>
+	>
 	readonly [foreignPathBuilderBrand]: true
 }
 
@@ -76,4 +87,12 @@ test("Path builder can proxy string methods", () => {
 	expect(result[Symbol.toPrimitive](), "Path builder `Symbol.toPrimitive` proxies").toBe("/foo/bar/baz")
 	expect(result.toString(), "Path builder `toString()` proxies").toBe("/foo/bar/baz")
 	expect(result[Symbol.toStringTag], "Path builder `Symbol.toStringTag` proxies").toBe("/foo/bar/baz")
+})
+
+test("Path builder serializes as its primitive path", () => {
+	const result = PathBuilder.from("/foo")("bar")
+
+	expect(JSON.stringify(result)).toBe('"/foo/bar"')
+	expect(JSON.stringify({ path: result })).toBe('{"path":"/foo/bar"}')
+	expectTypeOf(result.toJSON()).toEqualTypeOf<"/foo/bar">()
 })
