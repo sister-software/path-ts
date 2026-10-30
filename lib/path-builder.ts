@@ -38,6 +38,14 @@ export type ResolvePathBuilderSegments<Segments extends Array<string | number>, 
  */
 export interface PathBuilder<S extends string> extends String {
 	/**
+	 * Test whether this path is contained by another path.
+	 */
+	contains(path: string | PathBuilder): boolean
+	/**
+	 * Test whether this path contains another path.
+	 */
+	containsWithin(path: string | PathBuilder): boolean
+	/**
 	 * Append additional path segments to the current path.
 	 */
 	// Note: We shadow PathBuilder to allow instances of PathBuilder to be used as a function.
@@ -115,6 +123,24 @@ export class PathBuilder<S extends string = string> extends String implements Pa
 	 */
 	public basename(): PluckBasename<S> {
 		return posix.basename(this.toString()) as any
+	}
+
+	/**
+	 * Test whether this path is contained by another path.
+	 */
+	public contains(path: string | PathBuilder): boolean {
+		const relative = posix.relative(path.toString(), this.toString())
+
+		return relative === "" || (!relative.startsWith("..") && !posix.isAbsolute(relative))
+	}
+
+	/**
+	 * Test whether this path contains another path.
+	 */
+	public containsWithin(path: string | PathBuilder): boolean {
+		const relative = posix.relative(this.toString(), path.toString())
+
+		return relative === "" || (!relative.startsWith("..") && !posix.isAbsolute(relative))
 	}
 
 	public get [Symbol.toStringTag](): S {
