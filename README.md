@@ -3,7 +3,7 @@
 `path-ts` extends Node's `path` module with type safety.
 
 ```ts
-import { join, ext, parse, basename, dirname } from "path-ts"
+import { join, extname, parse, basename, dirname } from "path-ts"
 
 const path = join("foo", "bar", "baz") // 'foo/bar/baz'
 
